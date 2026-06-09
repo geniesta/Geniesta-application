@@ -1,0 +1,66 @@
+# --- エージェント/スペック関連（リポジトリに含めない） ---
+.claude/
+.kiro/
+
+# --- OS / エディタ ---
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+*~
+
+# --- 環境変数・シークレット ---
+.env
+.env.*
+!.env.example
+*.pem
+
+# --- ログ ---
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ===== frontend (Next.js / bun / TypeScript) =====
+node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+.next/
+out/
+build/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+
+# ===== backend (Go) =====
+# ビルド成果物（バイナリ）
+/backend/server
+/backend/bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+# テスト/カバレッジ
+*.test
+*.out
+# Go ワークスペース
+go.work
+go.work.sum
+
+# ===== Docker / インフラ =====
+# ローカル上書き用 compose（共有しない）
+docker-compose.override.yml
+# Terraform（infra/ 追加時用）
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl

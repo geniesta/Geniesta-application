@@ -1,0 +1,30 @@
+# build context = ./frontend
+# node_modules(679MB) / .next(111MB) を送らないことが最重要。
+# 依存はビルド時に bun install で取得し直す。
+
+# 依存・ビルド成果物
+node_modules
+.next
+out
+build
+.turbo
+
+# VCS / OS / IDE
+.git
+.gitignore
+.DS_Store
+.vscode
+.idea
+
+# ローカル環境・ログ
+.env*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker 関連（イメージに不要）
+Dockerfile*
+.dockerignore
+
+# ドキュメント
+*.md

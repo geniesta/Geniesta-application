@@ -1,0 +1,14 @@
+# nginx イメージビルド用 .dockerignore（BuildKit per-Dockerfile ignore）
+# build context = docker/nginx/
+# コピー対象は default.conf のみなので、他は除外。
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+
+# ── IDE ──
+.vscode
+.idea
+
+# ── ドキュメント ──
+*.md

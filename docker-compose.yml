@@ -1,0 +1,106 @@
+# ContribRadar — base 定義（全環境共通）。
+#
+# 単体では使わない。必ず overlay と重ねて使う:
+#   ローカル: docker compose -f docker-compose.local.yml up -d --build
+#   本番:     docker compose -f docker-compose.prod.yml up -d --build
+#
+# 方針:
+#   - 本番(EC2)で動かすバックエンドのみ base に置く: postgres / redis / bff / nginx。
+#   - frontend は本番では Vercel にデプロイするため base に置かない（local overlay のみ）。
+#   - 本番も EC2 上で全部コンテナ運用（マネージド DB/Redis は使わない＝コスト最優先）。
+#   - host ポート公開・dev/prod 固有設定（restart/TLS/dev ビルド）は overlay 側。
+#     理由: compose の `ports:` はマージで追記され、base で公開すると上位で消せないため。
+#   - DB/Redis 接続先はホスト名を環境変数化（将来 RDS/ElastiCache に移すなら
+#     POSTGRES_HOST / REDIS_HOST を差し替えるだけでコード変更不要）。
+#   - マイグレーションは ent が起動時に自動実行（手動不要）。
+
+# プロジェクト名を固定（volume/network 名が geniesta_* で安定。ディレクトリ名に依存しない）。
+name: geniesta
+
+services:
+
+  # ── データストア（現状 bff は未使用。profile "db" を付けた時だけ起動する） ────────
+  # 起動したい場合: docker compose --profile db -f docker-compose.local.yml up -d
+  # full BFF を復元したら profiles 行を外して常時起動に戻す。
+
+  postgres:
+    container_name: postgres
+    profiles: ["db"]
+    build:
+      context: ./docker/db
+      dockerfile: Dockerfile
+    image: postgres
+    environment:
+      POSTGRES_USER:     ${POSTGRES_USER:-geniesta}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-geniesta}
+      POSTGRES_DB:       ${POSTGRES_DB:-geniesta}
+    volumes:
+      # postgres 18+ は /var/lib/postgresql にマウント（永続化）
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test:     ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-geniesta}"]
+      interval: 5s
+      timeout:  3s
+      retries:  10
+
+  redis:
+    container_name: redis
+    profiles: ["db"]
+    build:
+      context: ./docker/redis
+      dockerfile: Dockerfile
+    image: redis
+    healthcheck:
+      test:     ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout:  3s
+      retries:  10
+
+  # ── アプリケーション ────────────────────────────────────────────────────────────
+
+  bff:
+    container_name: bff
+    build:
+      context: ./backend
+      dockerfile: ../docker/backend/Dockerfile
+    image: bff
+    environment:
+      PORT: "8080"
+      # 現状は hello world のみ（標準ライブラリ）。DB/Redis/GitHub は未使用。
+      # full BFF（gqlgen+ent）は backup/full-bff ブランチに退避。復元時に env/依存を戻す。
+    restart: unless-stopped
+    # healthcheck は Dockerfile の HEALTHCHECK 命令で定義
+
+  # frontend は本番では Vercel にデプロイするため base には無い。
+  # ローカル開発用の frontend コンテナは docker-compose.local.yml に定義。
+
+  # ── リバースプロキシ ─────────────────────────────────────────────────────────────
+
+  nginx:
+    container_name: nginx
+    build:
+      context: ./docker/nginx
+      dockerfile: Dockerfile
+    image: nginx
+    depends_on:
+      - bff
+    restart: unless-stopped
+
+  # ── ツール（任意・--profile tools） ──────────────────────────────────────────────
+  # ent が起動時に auto-migrate するため通常は不要。旧 SQL migration の手動適用用。
+  migrate:
+    container_name: migrate
+    image: migrate/migrate:v4.18.1
+    profiles: ["tools"]
+    volumes:
+      - ./backend/db/migrations:/migrations:ro
+    command:
+      - "-path=/migrations"
+      - "-database=postgres://${POSTGRES_USER:-geniesta}:${POSTGRES_PASSWORD:-geniesta}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-geniesta}?sslmode=${DB_SSLMODE:-disable}"
+      - "up"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:

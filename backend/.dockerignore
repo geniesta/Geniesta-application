@@ -1,0 +1,13 @@
+# build context = ./backend
+.git
+.gitignore
+.DS_Store
+.vscode
+.idea
+*.md
+.env
+.env.*
+/bin
+/dist
+/tmp
+*.test
