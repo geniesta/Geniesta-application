@@ -27,7 +27,7 @@ jobs:
           - docker/redis/Dockerfile
           - docker/nginx/Dockerfile
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Hadolint ${{ matrix.dockerfile }}
         uses: hadolint/hadolint-action@v3.1.0
         with:
@@ -47,7 +47,7 @@ jobs:
             context: frontend
             dockerfile: docker/frontend/Dockerfile
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Build ${{ matrix.image }}
         run: docker build -t ${{ matrix.image }}:scan -f ${{ matrix.dockerfile }} ${{ matrix.context }}
       - name: Trivy scan ${{ matrix.image }}（HIGH/CRITICAL で失敗）
