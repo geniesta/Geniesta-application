@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 #
-# ContribRadar frontend — マルチステージ本番イメージ。
+# frontend — マルチステージ本番イメージ。
 # - 依存解決/ビルドは bun（高速）。
 # - 実行は node:22-alpine（OS 脆弱性が少ない）。runtime 不要の npm は削除して攻撃面を縮小。
 # - 非 root 実行。

@@ -1,4 +1,4 @@
-# ContribRadar — base 定義（全環境共通）。
+# base 定義（全環境共通）。
 #
 # 単体では使わない。必ず overlay と重ねて使う:
 #   ローカル: docker compose -f docker-compose.local.yml up -d --build

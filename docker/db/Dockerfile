@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 #
-# ContribRadar PostgreSQL — 公式イメージを継承したプロジェクト固有 DB イメージ。
+# PostgreSQL — 公式イメージを継承したプロジェクト固有 DB イメージ。
 # スキーマ適用は golang-migrate（compose の migrate サービス）が担うため、
 # ここでは拡張・ロケール・チューニング等の土台のみを定義する。
 FROM postgres:18-alpine

@@ -1,3 +1,3 @@
-module github.com/contribradar/bff
+module github.com/geniesta/bff
 
 go 1.26

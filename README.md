@@ -1,5 +1,3 @@
-# ContribRadar
-
 OSS への貢献機会を見つける GitHub リポジトリ検索アプリ。
 
 - **frontend**: Next.js v16（App Router / bun）。本番は Vercel。

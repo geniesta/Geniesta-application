@@ -1,4 +1,4 @@
-// ContribRadar BFF — 暫定の最小サーバー（hello world）。
+// BFF — 暫定の最小サーバー（hello world）。
 //
 // 本格実装（gqlgen + ent + GitHub アダプタ + スコアリング）は
 // backup/full-bff ブランチに退避済み。復元は:

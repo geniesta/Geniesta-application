@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 #
-# ContribRadar BFF — マルチステージ。静的バイナリを distroless・非 root で実行。
+# BFF — マルチステージ。静的バイナリを distroless・非 root で実行。
 # 現状は標準ライブラリのみの最小サーバー（外部依存なし）。
 
 FROM golang:1.26-alpine AS builder
