@@ -40,7 +40,7 @@ jobs:
         run: docker build -t geniesta:scan -f frontend/Dockerfile frontend
       - name: Trivy scan（HIGH/CRITICAL で失敗）
         # @master は可変参照で避ける。タグ固定し、更新は dependabot(github-actions) に任せる。
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: geniesta:scan
           severity: "HIGH,CRITICAL"
