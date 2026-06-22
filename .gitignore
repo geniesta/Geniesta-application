@@ -64,3 +64,6 @@ docker-compose.override.yml
 *.tfstate.*
 .terraform/
 .terraform.lock.hcl
+
+# 内部作業メモ（バックログ・課題リスト）。レビュー対象外のため追跡しない。
+doc/internal/
