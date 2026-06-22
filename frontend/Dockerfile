@@ -18,6 +18,9 @@ FROM oven/bun:1 AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# public/ は静的アセットが無い場合 git に存在しない（空ディレクトリは追跡されない）。
+# 後段の runner が COPY /app/public で失敗しないよう、空でも必ず存在させる。
+RUN mkdir -p public
 ENV NEXT_TELEMETRY_DISABLED=1
 # standalone 出力を有効化（Docker セルフホスト用）
 ENV DOCKER_BUILD=1
