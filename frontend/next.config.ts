@@ -5,11 +5,6 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 const nextConfig: NextConfig = {
-  // Docker セルフホスト用の standalone 出力。
-  // Vercel は独自のビルド最適化を行うため不要（設定しないこと）。
-  // Dockerfile で DOCKER_BUILD=1 をセットした場合のみ有効になる。
-  output: process.env.DOCKER_BUILD === "1" ? "standalone" : undefined,
-
   // GitHub のオーナーアイコンを next/image で最適化するため許可。
   images: {
     remotePatterns: [

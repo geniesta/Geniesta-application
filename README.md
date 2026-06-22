@@ -59,7 +59,7 @@ GITHUB_TOKEN=ghp_xxxxxxxx   # GitHub の Personal Access Token（public 読み�
 
 - **フロント**：Next.js v16（App Router・RSC）/ React 19 / TypeScript(strict) / Tailwind v4 / shadcn/ui
 - **データ取得**：サーバー側（Server Component / Route Handler）。GitHub REST+GraphQL / OSV / レジストリ。ISR（`unstable_cache`/revalidate）＋サーキットブレーカ・single-flight・graceful degradation。
-- **アーキ**：Next.js 単体（別建て BFF/DB なし）。推奨デプロイ先は Vercel、任意で Docker standalone。
+- **アーキ**：Next.js 単体（別建て BFF/DB なし）。デプロイ先は Vercel。
 - **i18n / テーマ**：next-intl（ja/en・cookie ベース）/ system・time・light・dark。
 
 ## テスト戦略
