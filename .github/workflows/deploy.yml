@@ -1,0 +1,71 @@
+# 自動デプロイ（143 main→staging→prod ゲート付き）＋ ロールバック（149）の土台。
+# Vercel を例にした雛形。VERCEL_TOKEN シークレット未設定なら各ステップはスキップ（土台のみ）。
+# - staging は main push で自動。production は environment の required reviewers が承認ゲート。
+# - workflow_dispatch の ref に過去タグを渡せば、その版を再デプロイ＝ロールバック。
+name: deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "デプロイ対象の tag/branch/sha（ロールバックは過去の vX.Y.Z を指定）"
+        required: false
+
+permissions:
+  contents: read
+
+# デプロイは進行中のものを中断しない（cancel-in-progress: false）。直列化のみ。
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: frontend
+
+jobs:
+  staging:
+    runs-on: ubuntu-latest
+    environment: staging
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - name: Guard（未設定なら土台のみ）
+        if: env.VERCEL_TOKEN == ''
+        run: echo "::notice::VERCEL_TOKEN 未設定。デプロイ土台のみ（スキップ）。"
+      - uses: actions/checkout@v4
+        if: env.VERCEL_TOKEN != ''
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
+      - name: Deploy to staging
+        if: env.VERCEL_TOKEN != ''
+        run: |
+          npx vercel pull --yes --environment=preview --token "$VERCEL_TOKEN"
+          npx vercel build --token "$VERCEL_TOKEN"
+          npx vercel deploy --prebuilt --token "$VERCEL_TOKEN"
+
+  production:
+    runs-on: ubuntu-latest
+    needs: staging
+    environment: production # ← repo 設定の required reviewers が承認ゲート（143）
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - name: Guard（未設定なら土台のみ）
+        if: env.VERCEL_TOKEN == ''
+        run: echo "::notice::VERCEL_TOKEN 未設定。デプロイ土台のみ（スキップ）。"
+      - uses: actions/checkout@v4
+        if: env.VERCEL_TOKEN != ''
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
+      - name: Deploy to production
+        if: env.VERCEL_TOKEN != ''
+        run: |
+          npx vercel pull --yes --environment=production --token "$VERCEL_TOKEN"
+          npx vercel build --prod --token "$VERCEL_TOKEN"
+          npx vercel deploy --prebuilt --prod --token "$VERCEL_TOKEN"

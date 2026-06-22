@@ -1,0 +1,25 @@
+# 依存の自動更新（自プロダクトのドッグフーディング＝「姿勢」軸の実践）。
+# frontend(npm) / GitHub Actions を週次でチェック。
+# ※ Go BFF は撤去済みのため gomod は対象外（README「振り返り」参照）。
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      # 小さな更新はまとめて1PRに（レビュー負荷を下げる）。
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+    ignore:
+      # メジャー更新は自動 PR を立てない（破壊的変更はまとめて手動で検証する方針）。
+      # 例: @vitest/coverage-v8 のメジャーは vitest 本体と一致させる必要があり、
+      #     @types/node は実行環境(Node 22)に合わせるなど、単独更新が壊れやすいため。
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
