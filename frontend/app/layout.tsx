@@ -81,17 +81,18 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      // ダークモードは OS 設定連動（下の head スクリプトが描画前に .dark を付与）。
+      // ダークモードは既定で時刻連動（下の head スクリプトが描画前に .dark を付与）。
       // 属性は SSR 後にスクリプトで変わるため、html だけ hydration 警告を抑制する。
       suppressHydrationWarning
       className={`${inter.variable} ${notoJp.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
-        {/* ダークモード(OS連動)の FOUC 回避：描画前（同期）に documentElement へ反映する。 */}
+        {/* ダークモード(既定=時刻連動)の FOUC 回避：描画前（同期）に documentElement へ反映する。
+            保存値が無い/不明なら time 既定＝夜間帯(18–6時)はダーク。 */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{var th=localStorage.getItem('geniesta:theme');var h=new Date().getHours();var night=(h>=18||h<6);var dk;if(th==='dark')dk=true;else if(th==='light')dk=false;else if(th==='time')dk=night;else dk=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);if(dk)document.documentElement.classList.add('dark');}catch(e){}",
+              "try{var th=localStorage.getItem('geniesta:theme');var h=new Date().getHours();var night=(h>=18||h<6);var dk;if(th==='dark')dk=true;else if(th==='light')dk=false;else dk=night;if(dk)document.documentElement.classList.add('dark');}catch(e){}",
           }}
         />
       </head>
