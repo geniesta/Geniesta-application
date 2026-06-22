@@ -41,8 +41,10 @@ test.describe("異常系とキーボード", () => {
     await page.getByRole("button", { name: /比較に追加/ }).click();
     const tray = page.getByRole("region", { name: "比較トレイ" });
     await expect(tray).toBeVisible();
-    // トレイ内の削除ボタン（aria-label に slug を含む）を押す。
-    await tray.getByRole("button", { name: /facebook\/react/ }).click();
+    // トレイ内の削除ボタンを「アクション名」で特定する（slug はリポジトリ改名で変わり得るため
+    // ハードコードしない。例: facebook/react は GitHub 上で react/react に改名済み）。
+    // 新規コンテキストでトレイ内の項目は1件なので、削除ボタンは一意。
+    await tray.getByRole("button", { name: /比較から外す/ }).click();
     await expect(tray).toBeHidden();
   });
 });
