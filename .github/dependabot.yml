@@ -1,0 +1,19 @@
+# 依存の自動更新（自プロダクトのドッグフーディング＝「姿勢」軸の実践）。
+# frontend(npm) / GitHub Actions を週次でチェック。
+# ※ Go BFF は撤去済みのため gomod は対象外（README「振り返り」参照）。
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      # 小さな更新はまとめて1PRに（レビュー負荷を下げる）。
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

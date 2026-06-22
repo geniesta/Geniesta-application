@@ -1,0 +1,28 @@
+# リリースノート自動生成（147）。`vX.Y.Z` タグを push すると、PR ラベルに基づく
+# 変更履歴つきの GitHub Release を自動作成する（.github/release.yml の分類を使用）。
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write # リリース作成に必要
+
+# リリースは中断しない（タグ単位で直列化）。
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 変更履歴生成のため全履歴
+      - name: Create GitHub Release (auto-generated notes)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "$GITHUB_REF_NAME" --generate-notes --verify-tag --title "$GITHUB_REF_NAME"

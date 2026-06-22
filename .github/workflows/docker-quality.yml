@@ -1,59 +1,48 @@
 name: docker-quality
 
 # Dockerfile の Lint（Hadolint）と、ビルド済みイメージの脆弱性スキャン（Trivy）。
+# Docker は「任意」のセルフホスト用（既定デプロイは Vercel）なので、Dockerfile が
+# 変わった時だけ回す（全 frontend PR でフルイメージビルドを走らせない）。
 on:
   pull_request:
     paths:
-      - "docker/**"
-      - "backend/**"
-      - "frontend/**"
-      - "docker-compose*.yml"
+      - "frontend/Dockerfile"
+      - "frontend/.dockerignore"
       - ".github/workflows/docker-quality.yml"
   push:
     branches: [main]
+    paths:
+      - "frontend/Dockerfile"
+      - "frontend/.dockerignore"
+      - ".github/workflows/docker-quality.yml"
+
+concurrency:
+  group: docker-quality-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  # ── Hadolint: 全 Dockerfile を静的解析 ──────────────────────────────────────────
+  # ── Hadolint: Dockerfile を静的解析 ─────────────────────────────────────────────
   hadolint:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        dockerfile:
-          - docker/backend/Dockerfile
-          - docker/frontend/Dockerfile
-          - docker/frontend/Dockerfile.dev
-          - docker/db/Dockerfile
-          - docker/redis/Dockerfile
-          - docker/nginx/Dockerfile
     steps:
-      - uses: actions/checkout@v5
-      - name: Hadolint ${{ matrix.dockerfile }}
+      - uses: actions/checkout@v4
+      - name: Hadolint frontend/Dockerfile
         uses: hadolint/hadolint-action@v3.1.0
         with:
-          dockerfile: ${{ matrix.dockerfile }}
+          dockerfile: frontend/Dockerfile
 
-  # ── Trivy: 自前イメージ（bff / frontend）を脆弱性スキャン ──────────────────────
+  # ── Trivy: 自前イメージ（frontend）を脆弱性スキャン ──────────────────────────────
   trivy:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - image: bff
-            context: backend
-            dockerfile: docker/backend/Dockerfile
-          - image: frontend
-            context: frontend
-            dockerfile: docker/frontend/Dockerfile
     steps:
-      - uses: actions/checkout@v5
-      - name: Build ${{ matrix.image }}
-        run: docker build -t ${{ matrix.image }}:scan -f ${{ matrix.dockerfile }} ${{ matrix.context }}
-      - name: Trivy scan ${{ matrix.image }}（HIGH/CRITICAL で失敗）
-        uses: aquasecurity/trivy-action@master
+      - uses: actions/checkout@v4
+      - name: Build image（build context = frontend/）
+        run: docker build -t geniesta:scan -f frontend/Dockerfile frontend
+      - name: Trivy scan（HIGH/CRITICAL で失敗）
+        # @master は可変参照で避ける。タグ固定し、更新は dependabot(github-actions) に任せる。
+        uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: ${{ matrix.image }}:scan
+          image-ref: geniesta:scan
           severity: "HIGH,CRITICAL"
           exit-code: "1"
           ignore-unfixed: true

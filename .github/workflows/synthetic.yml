@@ -1,0 +1,25 @@
+# 合成監視（157）。デプロイ先の死活＋データ源の縮退を定期的に外形チェックする土台。
+# SYNTHETIC_URL シークレット（例: https://your-deployment）を設定すると実行。未設定ならスキップ。
+name: synthetic
+
+on:
+  schedule:
+    - cron: "*/30 * * * *" # 30 分ごと
+  workflow_dispatch: {}
+
+concurrency:
+  group: synthetic
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Synthetic health check
+        env:
+          SYNTHETIC_URL: ${{ secrets.SYNTHETIC_URL }}
+        run: node frontend/scripts/synthetic-check.mjs
