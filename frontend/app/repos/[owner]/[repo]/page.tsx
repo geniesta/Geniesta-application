@@ -42,9 +42,12 @@ export async function generateMetadata({
   params: Params;
 }): Promise<Metadata> {
   const { owner, repo } = await params;
-  // 存在チェックは「本体のストリーミング前」に走る generateMetadata で行う。
-  // 詳細ルートには loading.tsx があり、本体描画中に notFound() しても 200 が先に flush され
-  // 404 にできない（App Router の仕様）。ここで先に弾けば正しく 404 を返せる。
+  // 未存在は HTTP 404 ステータスで返す（SEO/正しさ）。これにはレスポンスの 1 バイト目より前に
+  // notFound() が走る必要がある。Next 16 は generateMetadata を通常ブラウザ向けに「ストリーミング」
+  // するため、ここでの notFound() はステータス確定をブロックしない（bot 等の HTML-limited UA では
+  // ブロックする）。確実な 404 は、このルートに loading.tsx を置かず本体（page）の await を
+  // ブロックさせることで担保する（重いセクションだけ内側 <Suspense> でストリーミングする）。
+  // ここの存在チェックは bot 向けの早期 404 ＋ メタデータ最小化のための補助。
   // getRepoDetail は unstable_cache 済みのため本体側の取得と重複しない（追加 API なし）。
   try {
     await getRepoDetail(owner, repo);
