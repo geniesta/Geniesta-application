@@ -152,6 +152,9 @@ export function SearchBar({
           }}
           placeholder={compact ? t("compactPlaceholder") : t("placeholder")}
           aria-label={t("ariaLabel")}
+          // フォーム項目に name を付与（ブラウザのフォーム認識/オートフィル向けの推奨。
+          // 送信は onSubmit→router.push で行うため挙動には影響しない）。検索クエリ param と一致。
+          name="q"
           role="combobox"
           aria-expanded={showList}
           aria-controls={showList ? listId : undefined}
