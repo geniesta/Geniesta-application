@@ -8,11 +8,11 @@ export function AnchorNav({
   label: string;
   title?: string;
 }) {
-  // UX60/61 sticky 化：スクロール中も各セクションへ移動でき、現在地（パッケージ名）も保持する。
+  // 通常フローのアンカーナビ（sticky にせず、スクロールで本文と一緒に流れる）。
   return (
     <nav
       aria-label={label}
-      className="sticky top-2 z-30 mb-5 flex flex-wrap items-center gap-1.5 rounded-lg border bg-background/90 p-2 text-xs shadow-sm backdrop-blur"
+      className="mb-5 flex flex-wrap items-center gap-1.5 rounded-lg border bg-background p-2 text-xs shadow-sm"
     >
       {title ? (
         <span className="mr-1 max-w-[40%] truncate border-r pr-2 font-semibold text-foreground">

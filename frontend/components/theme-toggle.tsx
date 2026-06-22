@@ -10,7 +10,7 @@ import {
   subscribeTheme,
 } from "@/lib/stores/theme-store";
 
-// テーマ切替（システム / ライト / ダーク）。OS 自動を既定にしつつ手動上書きできる。
+// テーマ切替（時刻連動 / ライト / ダーク）。既定は時刻連動（夜は自動でダーク）。
 export function ThemeToggle() {
   const t = useTranslations("theme");
   const theme = useSyncExternalStore(
@@ -19,7 +19,6 @@ export function ThemeToggle() {
     getThemeServerSnapshot,
   );
   const opts: Array<{ value: Theme; icon: React.ReactNode }> = [
-    { value: "system", icon: <SystemIcon /> },
     { value: "time", icon: <ClockIcon /> },
     { value: "light", icon: <SunIcon /> },
     { value: "dark", icon: <MoonIcon /> },
@@ -63,14 +62,6 @@ const sv = {
   "aria-hidden": true,
 };
 
-function SystemIcon() {
-  return (
-    <svg {...sv}>
-      <rect width="20" height="14" x="2" y="3" rx="2" />
-      <path d="M8 21h8M12 17v4" />
-    </svg>
-  );
-}
 function SunIcon() {
   return (
     <svg {...sv}>
