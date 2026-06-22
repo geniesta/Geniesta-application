@@ -3,8 +3,8 @@
 import { useEffect } from "react";
 import { getTheme, applyTheme } from "@/lib/stores/theme-store";
 
-// 時刻連動（time）モードで夜間帯の境界（18:00 / 06:00）をまたいでも、開いたまま切り替わるよう
-// 毎分＋復帰時に再適用する。system モードの OS 変更にも追従（保険）。表示は持たない。
+// 時刻連動（time・既定）モードで夜間帯の境界（18:00 / 06:00）をまたいでも、開いたまま
+// 切り替わるよう毎分＋復帰時（visibilitychange / focus）に再適用する。表示は持たない。
 export function ThemeWatcher() {
   useEffect(() => {
     const reapply = () => applyTheme(getTheme());

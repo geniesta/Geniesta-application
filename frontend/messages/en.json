@@ -138,7 +138,6 @@
   },
   "theme": {
     "label": "Theme",
-    "system": "System (follows OS)",
     "time": "Time-based (dark at night)",
     "light": "Light",
     "dark": "Dark"
