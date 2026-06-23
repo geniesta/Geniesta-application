@@ -38,7 +38,7 @@ jobs:
       - name: Guard（未設定なら土台のみ）
         if: env.VERCEL_TOKEN == ''
         run: echo "::notice::VERCEL_TOKEN 未設定。デプロイ土台のみ（スキップ）。"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         if: env.VERCEL_TOKEN != ''
         with:
           ref: ${{ github.event.inputs.ref || github.ref }}
@@ -59,7 +59,7 @@ jobs:
       - name: Guard（未設定なら土台のみ）
         if: env.VERCEL_TOKEN == ''
         run: echo "::notice::VERCEL_TOKEN 未設定。デプロイ土台のみ（スキップ）。"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         if: env.VERCEL_TOKEN != ''
         with:
           ref: ${{ github.event.inputs.ref || github.ref }}
