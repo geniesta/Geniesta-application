@@ -12,10 +12,10 @@ GitHub の OSS ライブラリ/リポジトリを、**star でなく「信頼に
 すべて **Server Component / Route Handler（サーバー側）** で外部 API を直接叩く。`GITHUB_TOKEN` 等は
 サーバー側のみで使い、クライアントに露出しない。
 
-- **クリーンアーキの層分離（依存は内向き）**:
+- **レイヤード構成 ＋ FW 非依存の純ドメイン核**（"クリーンアーキ"ではない＝ポート/DIP は未導入。下記補足）:
   - `lib/types.ts` … ドメイン型（Repo 等。framework/infra 非依存の最内層）
-  - `lib/*`（直下）… ドメイン純関数（trust / facts / version / licenses / search-query / sbom / pkg-name / site / flags …）
-  - `lib/use-cases/*` … アプリケーション層（評価のオーケストレーション。例 `evaluate-repo.ts`）
+  - `lib/*`（直下）… ドメイン純関数（trust / facts / version / licenses / search-query / sbom / pkg-name / site / flags …）。**infra を一切 import しない**（依存の逆流なし＝ドメインのみ隔離してテスト可能）
+  - `lib/use-cases/*` … アプリケーション層（評価のオーケストレーション。例 `evaluate-repo.ts`）。**具体インフラを直接 import する**（依存性逆転はしない＝RSC では過剰と判断）
   - `lib/server/**` … インフラ層（github / osv / registries / manifest / external / observability）。**各ファイル先頭に
     `import "server-only";`** ＝クライアントが誤 import したら**ビルドで失敗**（境界をコンパイラが強制）
   - `lib/stores/**` … クライアント状態（compare / recent / theme / watch。localStorage + `useSyncExternalStore`）
